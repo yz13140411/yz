@@ -19,8 +19,6 @@ public class CategoryController {
 
     @Autowired
     CategoryService categoryService;
-
-
     @GetMapping("/categories")
     public Page4Navigator<Category> list(@RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "5") int size) throws Exception {
         start = start < 0 ? 0 : start;

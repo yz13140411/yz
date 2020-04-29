@@ -4,6 +4,7 @@ import com.how2java.tmall.tmall_springboot.comparator.*;
 import com.how2java.tmall.tmall_springboot.page.Result;
 import com.how2java.tmall.tmall_springboot.pojo.*;
 import com.how2java.tmall.tmall_springboot.service.*;
+import com.how2java.tmall.tmall_springboot.similar.recommend;
 import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,6 @@ public class ForeRESTController {
         productService.fill(cs);
         productService.fillByRow(cs);
         categoryService.removeCategoryFromProduct(cs);
-
         return cs;
     }
     @PostMapping("/foreregister")
@@ -63,18 +63,87 @@ public class ForeRESTController {
     }
 
     @PostMapping("/forelogin")
-    public Object login(@RequestBody User userParam, HttpSession session) {
+    public Product login(@RequestBody User userParam, HttpSession session) {
         String name =  userParam.getName();
         name = HtmlUtils.htmlEscape(name);
+        String s=new String();
+        ArrayList<String> p_product = new ArrayList<>();
 
         User user =userService.get(name,userParam.getPassword());
         if(null==user){
-            String message ="账号密码错误";
-            return Result.fail(message);
+            Product product =new Product();
+            product.setName("账号密码错误");
+            return product;
         }
         else{
             session.setAttribute("user", user);
-            return Result.success();
+
+            List<Order> orders = orderService.listByUserWithoutDelete(user);
+            orderService.removeOrderFromOrderItem(orders);
+            for (Order order : orders) {
+                for (OrderItem os : order.orderItems) {
+                    s = s + " " + os.product.getId();
+                }
+            }
+            List<User> u = userService.list();
+
+            String p=new String();
+
+                for (User us : u) {
+                        List<Order> ll = orderService.listByUserWithoutDelete(us);
+                        if (ll.isEmpty())
+                            continue;
+                        else {
+                            for (Order order : orders) {
+                                for (OrderItem os : order.orderItems) {
+                                    p=p + " "+ os.product.getId();
+                                }
+                            }
+                            if(p!=null)
+                            {
+                                p_product.add(p);
+                                p=null;
+                            }
+                            else
+                            {continue;}
+                        }
+
+                }
+                String []pproduct =new String[p_product.size()];
+                pproduct=(String[]) p_product.toArray(pproduct);
+
+            recommend rec=new recommend();
+            rec.fit(pproduct);
+            double[] doubles = rec.recommendFun(s);
+
+            //取出最大关系的下标
+            double max = 0;    //关系
+            int maxIndex = 0;   //下标
+            for (int i = 0; i < doubles.length; i++) {
+
+                if (doubles[i] > max) {
+                    max = doubles[i];
+                    maxIndex = i;
+                }
+            }
+            if(max==0)
+            {
+                Product product =new Product();
+                product.setName("没有相似产品！");
+                return product;
+            }
+            else
+            {
+                Object object=rec.getProduct();
+                int lat= Integer.parseInt((String)(Arrays.asList(rec.getProduct().toArray()).get(maxIndex-1)));
+
+                return productService.product(lat).get(0);
+            }
+
+
+
+
+
         }
     }
 

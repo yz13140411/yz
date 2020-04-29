@@ -43,7 +43,7 @@ public class Order {
     private String status;
 
     @Transient
-    private List<OrderItem> orderItems;
+    public List<OrderItem> orderItems;
     @Transient
     private float total;
     @Transient

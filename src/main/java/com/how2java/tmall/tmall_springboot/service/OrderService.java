@@ -89,6 +89,7 @@ public class OrderService {
         return orderDAO.findByUserAndStatusNotOrderByIdDesc(user, OrderService.delete);
     }
 
+
     // 我的订单页面计算订单总金额。
     public void cacl(Order o) {
         List<OrderItem> orderItems = o.getOrderItems();

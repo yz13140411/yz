@@ -23,7 +23,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name="pid")
-    private Product product;
+    public Product product;
 
     @ManyToOne
     @JoinColumn(name="oid")
@@ -31,7 +31,6 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name="uid")
-
     private User user;
 
     private int number;

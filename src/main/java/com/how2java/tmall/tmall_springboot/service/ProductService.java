@@ -92,6 +92,17 @@ public class ProductService  {
         List<Product> products =productDAO.findByNameLike("%"+keyword+"%",pageable);
         return products;
     }
+//推荐的相似产品
+    public List<Product> product(int s)
+    {
 
+        return productDAO.findById(s);
+    }
 
+    /**
+     *
+     */
+    public void recommendProduct() {
+
+    }
 }

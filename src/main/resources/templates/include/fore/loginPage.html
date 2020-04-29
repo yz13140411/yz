@@ -3,6 +3,7 @@
         $(function(){
             var data4Vue = {
                 uri:'forelogin',
+                u:'similar',
                 result: [],
                 user:{name:'', password:''}
             };
@@ -29,12 +30,16 @@
 
                         axios.post(url,this.user).then(function(response) {
                             var result = response.data;
-                            if(result.code==0){
+                            if(result.name=="没有相似产品!"){
                                 location.href="home";
+                                alert("没有相似产品！")
                             }
-                            else{
+                            else if(result.name=="账号密码错误"){
                                 $("span.errorMessage").html(result.message);
                                 $("div.loginErrorMessageDiv").css("visibility","visible");
+                            }
+                            else{
+                                location.href="product?pid="+result.id;
                             }
                         });
                     }
@@ -72,9 +77,9 @@
 					<span class="loginInputIcon ">
 						<span class=" glyphicon glyphicon-lock"></span>
 					</span>
-                <input v-model="user.password" type="password" placeholder="密码" type="text">
+                <input v-model="user.password" type="password" placeholder="密码">
             </div>
-            <span class="text-danger">不要输入真实的天猫账号密码</span><br><br>
+            <span class="text-danger">请核对账号密码</span><br><br>
             <div>
                 <a class="notImplementLink" href="#nowhere">忘记登录密码</a>
                 <a href="register" class="pull-right">免费注册</a>
