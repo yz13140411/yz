@@ -40,6 +40,15 @@ public class ForeRESTController {
         productService.fill(cs);
         productService.fillByRow(cs);
         categoryService.removeCategoryFromProduct(cs);
+        List<Product> randomProduct = productService.recommendProduct();
+        Category category = new Category();
+        category.setName("猜你喜欢");
+        category.setProducts(randomProduct);
+        category.setId(10086);
+        List<List<Product>> productByRow = new ArrayList<>();
+        productByRow.add(randomProduct);
+        category.setProductsByRow(productByRow);
+        cs.add(0, category);
         return cs;
     }
     @PostMapping("/foreregister")
@@ -77,7 +86,6 @@ public class ForeRESTController {
         }
         else{
             session.setAttribute("user", user);
-
             List<Order> orders = orderService.listByUserWithoutDelete(user);
             orderService.removeOrderFromOrderItem(orders);
             for (Order order : orders) {
@@ -86,9 +94,7 @@ public class ForeRESTController {
                 }
             }
             List<User> u = userService.list();
-
             String p=new String();
-
                 for (User us : u) {
                         List<Order> ll = orderService.listByUserWithoutDelete(us);
                         if (ll.isEmpty())
